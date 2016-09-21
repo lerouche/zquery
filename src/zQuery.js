@@ -733,17 +733,18 @@ var $ = (function(undefined) {
 
 			return new Proxy(data, {
 				set: function(target, property, value) {
+					target[property] = value;
+
 					var associations = assoc[property];
 					if (associations) {
 						zQ_fn_iterate(associations, function(attrOrTextnode) {
 							attrOrTextnode[attrOrTextnode instanceof Attr ? 'value' : 'textContent'] = attrOrTextnode[TEMPLATE_TEXT_PROP_NAME]
 								.replace(zQ_set_regexp_handlebars, function(_, propName) {
-									return value;
+									return target[propName];
 								});
 						}, false);
 					}
 
-					target[property] = value;
 					return true;
 				}
 			});
