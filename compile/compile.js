@@ -2,7 +2,15 @@ const fs = require('fs'),
 	  UglifyJS = require('uglify-js'),
 
 	  SRC = '../src/zQuery.js',
-	  DST = 'zQuery.js';
+	  DST_DEFAULT = './zQuery.js';
+
+var dest = process.argv.find(arg => /^\-o=.+$/.test(arg));
+if (dest) {
+	dest = dest.slice(3);
+	if (dest.slice(-1) == '/') dest += 'zQuery.js';
+} else {
+	dest = DST_DEFAULT;
+}
 
 var code = fs.readFileSync(SRC, { encoding: 'utf8' });
 
@@ -21,4 +29,4 @@ ast.mangle_names();
 
 code = ast.print_to_string();
 
-fs.writeFileSync(DST, code);
+fs.writeFileSync(dest, code);
