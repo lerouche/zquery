@@ -1,3 +1,7 @@
+const fs = require('fs'),
+
+	  SRC_DIR = '../src';
+
 var args = process.argv.slice(2),
 	dest = args.find(arg => /^\-o=.+$/.test(arg)),
 	debug = args.some(arg => /^debug$/.test(arg));
@@ -5,9 +9,9 @@ var args = process.argv.slice(2),
 dest = dest ? dest.slice(3) : '.';
 
 require('zcompile')({
-	src: '.',
+	src: SRC_DIR,
 	dst: dest,
 
-	files: [ 'zQuery.js' ],
+	files: fs.readdirSync(SRC_DIR),
 	debug: debug,
 });
