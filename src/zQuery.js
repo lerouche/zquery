@@ -1347,11 +1347,6 @@ var $ = (function(undefined) {
 				handler_success = func || gen_func;
 				return this;
 			},
-			then: function(resolve, reject) {
-				handler_success = resolve || gen_func;
-				handler_error = reject || gen_func;
-				return this;
-			},
 			on: function(event, handler) {
 				xhr.addEventListener(event, handler);
 				return this;
