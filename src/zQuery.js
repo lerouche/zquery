@@ -961,6 +961,7 @@ var $ = (function(undefined) {
 
 	/*
 		switch (typeof classes) {
+			// NOTE: Any classes with a dot at the beginning has its dot prefix removed, as it is assumed a class selector was provided (instead of literally wanting a class with a dot at the front)
 			case string:
 				// NOTE: The classes to use is from splitting the string by whitespace
 				-- prefixed with '*':
@@ -987,6 +988,9 @@ var $ = (function(undefined) {
 			if (noOperation) {
 				return this.get()[requireAll ? ai_every : ai_some](function(elem) {
 					return classes.every(function(className) {
+						if (className[0] == '.') {
+							className = className.slice(1);
+						}
 						return elem.classList.contains(className);
 					});
 				});
@@ -998,6 +1002,9 @@ var $ = (function(undefined) {
 				classes.forEach(list[mode], list);
 			*/
 			classes.forEach(function(name) {
+				if (name[0] == '.') {
+					name = name.slice(1);
+				}
 				elem.classList[mode](name);
 			});
 		}, false);
