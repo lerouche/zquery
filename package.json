@@ -1,0 +1,21 @@
+{
+  "name": "zquery-wl",
+  "version": "1.0.0",
+  "description": "A modern, super-lightweight DOM library for Evergreener pastures",
+  "main": "dist/zQuery.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lerouche/zQuery.git"
+  },
+  "keywords": [
+    "zquery",
+    "jquery",
+    "dom"
+  ],
+  "author": "Wilson Lin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lerouche/zQuery/issues"
+  },
+  "homepage": "https://github.com/lerouche/zQuery#readme"
+}

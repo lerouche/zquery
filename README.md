@@ -11,7 +11,7 @@ Set up
 From npm:
 
 ````
-npm install zquery
+npm install zquery-wl
 ````
 
 In your browser (CDN):

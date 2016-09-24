@@ -1545,5 +1545,9 @@ var $ = (function(undefined) {
 	};
 
 	// Setup complete, return pseudo-constructor alias
-	return $;
+	if (exports) {
+		module.exports = $;
+	} else {
+		window.$ = $;
+	}
 })();
