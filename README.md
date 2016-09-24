@@ -31,4 +31,4 @@ node compile.js -o=/folder/to/place/compiled/js
 Usage
 -----
 
-For the full documentation, go to https://wilsonl.in/zQuery
+For the full documentation, go to https://wilsonl.in/docs/zQuery
