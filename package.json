@@ -1,6 +1,6 @@
 {
   "name": "zquery-wl",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A modern, super-lightweight DOM library for Evergreener pastures",
   "main": "dist/zQuery.js",
   "repository": {
