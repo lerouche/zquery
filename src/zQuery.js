@@ -1,4 +1,4 @@
-var $ = (function(undefined) {
+(function(undefined) {
 	"use strict";
 
 	var
@@ -10,6 +10,7 @@ var $ = (function(undefined) {
 		TYPEOF_UNDEFINED = "undefined",
 
 		d = document,
+		w = window,
 		qsa = function(sel, context) {
 			return (context || d).querySelectorAll(sel);
 		},
@@ -104,7 +105,7 @@ var $ = (function(undefined) {
 			}
 
 			// Create from single Element
-			else if (source instanceof EN || source === window)
+			else if (source instanceof EN || source === w)
 			{
 				nodes = [source];
 			}
@@ -1556,6 +1557,6 @@ var $ = (function(undefined) {
 	if (typeof exports != TYPEOF_UNDEFINED) {
 		module.exports = $;
 	} else {
-		window.$ = $;
+		w.$ = $;
 	}
 })();
