@@ -7,6 +7,7 @@ var $ = (function(undefined) {
 		TYPEOF_OBJECT = "object",
 		TYPEOF_FUNCTION = "function",
 		TYPEOF_NUMBER = "number",
+		TYPEOF_UNDEFINED = "undefined",
 
 		d = document,
 		qsa = function(sel, context) {
@@ -1552,7 +1553,7 @@ var $ = (function(undefined) {
 	};
 
 	// Setup complete, return pseudo-constructor alias
-	if (exports) {
+	if (typeof exports != TYPEOF_UNDEFINED) {
 		module.exports = $;
 	} else {
 		window.$ = $;
