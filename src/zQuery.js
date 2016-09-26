@@ -147,6 +147,7 @@
 			Internal functions and variables
 		*/
 
+		zQ_set_prop_eventListeners = '_zqel',
 		zQ_set_regexp_whitespace = /\s+/,
 		zQ_set_regexp_captureEvents = /^(load|focus|blur|scroll|mouse(enter|leave))$/i,
 		zQ_set_regexp_handlebars = /{{\s*([$_a-zA-Z][$_a-zA-Z0-9]*)\s*}}/g,
@@ -1160,11 +1161,10 @@
 
 		eventTypes = eventTypes.split(zQ_set_regexp_whitespace);
 		zQ_fn_iterate(this, function(elem) {
-			var ez = elem.zQuery = elem.zQuery || {},
-				eData = ez.eventListeners = ez.eventListeners || [];
+			var listeners = elem[zQ_set_prop_eventListeners] = elem[zQ_set_prop_eventListeners] || [];
 
 			eventTypes.forEach(function(eventType) {
-				eData.push([eventType, handler]);
+				listeners.push([eventType, handler]);
 				elem.addEventListener(eventType, handler, zQ_set_regexp_captureEvents.test(eventType));
 			});
 		}, false);
@@ -1180,24 +1180,22 @@
 		eventTypes = eventTypes.split(zQ_set_regexp_whitespace);
 		zQ_fn_iterate(this, function(elem) {
 			// Get any zQuery properties on this element
-			var ez = elem.zQuery,
-				eData;
+			var listeners = elem[zQ_set_prop_eventListeners];
 
 			eventTypes.forEach(function(eventType) {
 				var eventTypeRequiresCapture = zQ_set_regexp_captureEvents.test(eventType);
 
 				// Remove all cached event listeners
 				if (eventFunction === undefined) {
-
-					if (ez && (eData = elem.zQuery.eventListeners)) {
+					if (listeners) {
 						// Loop through events and remove any listeners with matching event type
-						eData.forEach(function(eventData, i) {
+						listeners.forEach(function(eventData, i) {
 							if (eventData[0] == eventType) {
 								// Detach the event handler from the element
 								elem.removeEventListener(eventType, eventData[1], eventTypeRequiresCapture);
 
 								// GC: Delete event handler data (type and handler function) from the data array
-								delete eData[i];
+								delete listeners[i];
 							}
 						});
 					}
@@ -1217,19 +1215,18 @@
 		eventTypes = eventTypes.split(zQ_set_regexp_whitespace);
 		zQ_fn_iterate(this, function(elem) {
 			// Prepare HTMLElement object's zQuery eventListener property
-			var ez = elem.zQuery = elem.zQuery || {},
-				el = ez.eventListeners = ez.eventListeners || [];
+			var listeners = elem[zQ_set_prop_eventListeners] = elem[zQ_set_prop_eventListeners] || [];
 
 			// Assign and cache event listeners to this HTMLElement
 			eventTypes.forEach(function(eventType) {
-				var eID = el.length,
+				var eID = listeners.length,
 					eventTypeRequiresCapture = zQ_set_regexp_captureEvents.test(eventType),
-					eData = el[eID] = [eventType, function(e) {
+					listener = listeners[eID] = [eventType, function(e) {
 						eventFunction.call(this, e);
-						this.removeEventListener(eventType, eData[1], eventTypeRequiresCapture);
-						delete el[eID];
+						this.removeEventListener(eventType, listener[1], eventTypeRequiresCapture);
+						delete listeners[eID];
 					}];
-				elem.addEventListener(eventType, eData[1], eventTypeRequiresCapture);
+				elem.addEventListener(eventType, listener[1], eventTypeRequiresCapture);
 			});
 		}, false);
 		return this;
