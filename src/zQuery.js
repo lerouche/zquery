@@ -7,7 +7,6 @@
 		TYPEOF_OBJECT = "object",
 		TYPEOF_FUNCTION = "function",
 		TYPEOF_NUMBER = "number",
-		TYPEOF_UNDEFINED = "undefined",
 
 		d = document,
 		w = window,
@@ -94,7 +93,7 @@
 				if (parseType == 'xml') {
 					tmp = (new DOMParser).parseFromString(source, 'text/xml');
 					if (tmp.getElementsByTagName('parsererror').length) {
-						throw "[zQuery] Invalid XML.";
+						throw new SyntaxError("Invalid XML");
 					}
 					node = [tmp.documentElement];
 				} else {
@@ -118,7 +117,7 @@
 
 			else
 			{
-				throw "[zQuery] Unrecognised source.";
+				throw new TypeError("Unrecognised source");
 			}
 
 			// Cache length and create public method to return private array
@@ -208,8 +207,7 @@
 				WARNING: May return empty array, which is == false but TRUTHY
 			*/
 
-			// Not compatible with trailing text node(s), so ending '>' required
-			if (html[0] == '<' && html[html.length - 1] == '>') {
+			if (html[0] == '<') {
 				var tag = zQ_set_regexp_tag.exec(html)[1].toLowerCase(),
 					parser,
 					wrap,
@@ -233,6 +231,7 @@
 				/*
 					PROBLEM: Creating script tag inside temporary <div> will cause it to load its script if 'src' property is set before attaching to real document, making it a dud when appended to real document.
 					SOLUTION: Don't clone node when <script> element found, create a new one instead.
+					WARNING: All data inside <script> and its attributes except "src" will be deleted.
 				*/
 				else {
 					wrap = zQ_set_wrapMap[tag] || [0, '', ''];
@@ -243,8 +242,21 @@
 						parser = parser.lastChild;
 					}
 					// Must clone all children elements (not nodes) of parse container (<div>) to detach them from the parser
-					return ap.map.call(parser.children, function(c) {
-						return c.nodeName.toLowerCase() == 'script' ? d.createElement('script') : c.cloneNode(true);
+					return ap.map.call(parser.childNodes, function(c) {
+						if (c.nodeName.toLowerCase() == 'script') {
+							var clone = d.createElement('script');
+							// defer and async are ignored because all dynamic JS are loaded asynchronously
+							[
+								'text', 'type', 'src',
+								'integrity', 'crossorigin', 'charset',
+								'id', 'className',
+								'onload', 'onerror'
+							].forEach(function(prop) {
+								clone[prop] = c[prop];
+							});
+							return clone;
+						}
+						return c.cloneNode(true);
 					});
 				}
 			}
@@ -532,8 +544,10 @@
 		}
 
 		// Get the initial list of children
-		zQ_fn_iterate(this, function(elem) {
-			zQ_fn_merge_arrays(toCheck, elem.children)
+		zQ_fn_iterate(this, function(node) {
+			if (node.children) {
+				zQ_fn_merge_arrays(toCheck, node.children)
+			}
 		}, false);
 
 		// Loop through children, appending its children to the list
@@ -560,6 +574,7 @@
 			}
 
 			// Add more descendants to check later
+			// NOTE: elem should be an element (node type 1) so it definitely has the .children property
 			zQ_fn_merge_arrays(toCheck, elem.children);
 		}
 		return returnBool ? isMatching : $(toRet);
@@ -596,6 +611,7 @@
 		});
 	};
 
+	// WARNING: Returns -1 on non-elements
 	p.index = function(child) {
 		var current = this.get(0);
 		if (child instanceof zQuery) {
@@ -618,6 +634,7 @@
 	});
 
 	// NOTE: Very similar to zQ_fn_prevNext, but not using it due to the overhead of multiple constructions, array manipulations and functions
+	// NOTE: Will only get sibling elements (node type 1), even if itself is text or some other node
 	p.siblings = function(sel) {
 		return zQ_fn_iterate(this, function(elem) {
 			var ret = [];
@@ -662,7 +679,9 @@
 		}
 		return zQ_fn_iterate(this, function(elem) {
 			var child = elem.children;
-			return sel ? zQ_fn_filter(child, sel) : child;
+			if (child) { // Non-element nodes don't have children
+				return sel ? zQ_fn_filter(child, sel) : child;
+			}
 		});
 	};
 
@@ -1268,7 +1287,6 @@
 			xhrErrorObject;
 
 		xhr.onreadystatechange = function() {
-			console.log(xhr.readyState);
 			/*
 				So it's the spec to set readyState to 4 and fire this event on abort, and THEN set readyState to 0 (firing this event once more)...
 			*/
@@ -1278,30 +1296,25 @@
 					// If no error will be thrown, set the error object to the status (which is the HTTP response code)
 					xhrErrorObject = xhr.status;
 					statusOK = xhrErrorObject >= 200 && xhrErrorObject < 300 || xhrErrorObject == 304;
-					console.log(xhr.status);
 				} catch (e) {
 					// Communication/network error
 					xhrErrorObject = e;
 					statusOK = false;
 				}
-				console.log(statusOK);
 
 				if (statusOK) {
 					// 2XX or 304 code means OK
-					console.log('Firing success');
 					handler_success(xhr.responseText);
 				} else {
 					// Send back the error object and HTTP code, assuming code !== 2XX or 304 means error
-					console.log('Firing error');
 					// If error was not caught and instead is the status code, construct an error
 					if (!(xhrErrorObject instanceof Error)) {
-						xhrErrorObject = Error('[zQuery.ajax]: Request failed with status: ' + xhrErrorObject);
+						xhrErrorObject = Error('Request failed with status: ' + xhrErrorObject);
 					}
 					handler_error(xhrErrorObject, xhr.status, xhr.statusText);
 				}
 
 				// Run complete handler on Complete state
-				console.log('Firing complete');
 				handler_complete();
 			}
 		};
@@ -1348,6 +1361,7 @@
 				aborted = true;
 				xhr.abort();
 			},
+			/* DEPRECATED 2.0
 			error: function(func) {
 				handler_error = func || gen_func;
 				return this;
@@ -1360,10 +1374,14 @@
 				xhr.addEventListener(event, handler);
 				return this;
 			}
+			*/
 		};
 	};
 
+	/* DEPRECATED 2.0
 	$.isArrayLike = is_probably_array_like;
+	*/
+
 	/*
 		Iterate through a provided string, array, array-like object or object using a provided function. The function will be passed the arguments for an object:
 
@@ -1427,12 +1445,14 @@
 		Deepness:
 			0 or false or undefined: Shallow copy
 			1: Deep copy (all array(-like object)s and generic objects at all depths will also be shallow-copied)
-			2: Super copy:
-				- All generic objects and array-like* objects will be super-copied (* array-like objects will be converted into an array)
-				- Nodes will all be deep-copied at all levels, whether they are in an array(-like object) or children of a parent node
-				- Documents will be replaced with a deep-copied clone of its <html> element
-				- DocumentFragments will be replaced with a deep-copied generic array of their children
-				- Functions will be cloned
+
+			// DEPRECATED 2.0
+				2: Super copy:
+					- All generic objects and array-like* objects will be super-copied (* array-like objects will be converted into an array)
+					- Nodes will all be deep-copied at all levels, whether they are in an array(-like object) or children of a parent node
+					- Documents will be replaced with a deep-copied clone of its <html> element
+					- DocumentFragments will be replaced with a deep-copied generic array of their children
+					- Functions will be cloned
 
 		WARNING: MANY WARNINGS
 		======================
@@ -1456,6 +1476,7 @@
 			_,
 			replacement;
 
+		/* DEPRECATED 2.0
 		if (deepness == 2 && to_clone) {
 			if ((_ = to_clone.content || to_clone) instanceof DF) {
 				ret = zQ_fn_import_DF(_);
@@ -1468,6 +1489,7 @@
 				});
 			}
 		}
+		*/
 
 		if (is_array) {
 			ret = zQ_fn_clone_array(to_clone);
@@ -1517,6 +1539,8 @@
 
 		return array;
 	};
+
+	/* DEPRECATED 2.0
 	$.factory = function(template, variables_str, replacements_raw, escape_HTML) {
 		var i = 0,
 			code_final = '',
@@ -1552,9 +1576,10 @@
 		}
 		return code_final;
 	};
+	*/
 
 	// Setup complete, return pseudo-constructor alias
-	if (typeof exports != TYPEOF_UNDEFINED) {
+	if (typeof exports == TYPEOF_OBJECT) {
 		module.exports = $;
 	} else {
 		w.$ = $;
