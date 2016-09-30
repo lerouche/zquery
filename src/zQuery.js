@@ -17,6 +17,7 @@
 		NL = NodeList,
 		DF = DocumentFragment,
 		D = Document,
+		N = Node,
 		EN = Element, // Element node
 		ar = Array,
 		ap = ar.prototype,
@@ -31,7 +32,7 @@
 		gen_func = function() {},
 		is_probably_array_like = function(obj) {
 			// Arrays are objects
-			if (!obj || typeof obj != TYPEOF_OBJECT) {
+			if (typeof obj != TYPEOF_OBJECT) {
 				return false;
 			}
 
@@ -103,8 +104,8 @@
 				}
 			}
 
-			// Create from single Element
-			else if (source instanceof EN || source === w)
+			// Create from single Node
+			else if (source instanceof N || source == w)
 			{
 				nodes = [source];
 			}
@@ -320,7 +321,7 @@
 					// Don't just check for .length as some objects have a length property (e.g. parentNode)
 					if (result instanceof HC || result instanceof NL || isArr(result)) {
 						zQ_fn_merge_arrays(results, result);
-					} else if (result instanceof EN) {
+					} else if (result instanceof N) {
 						results.push(result);
 					}
 				}
