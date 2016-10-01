@@ -1258,9 +1258,10 @@
 		PUBLIC methods
 	*/
 
-	/*
+	/* DEPRECATED 2.0
+
 		Asynchronous JavaScript and XML
-	*/
+
 	$.ajax = function(ajaxSettings) {
 		var xhr = new XMLHttpRequest(),
 			beforeSend = ajaxSettings.beforeSend || gen_func,
@@ -1286,7 +1287,7 @@
 		xhr.onreadystatechange = function() {
 			/*
 				So it's the spec to set readyState to 4 and fire this event on abort, and THEN set readyState to 0 (firing this event once more)...
-			*/
+			*
 			// 4 is Complete state
 			if (!aborted && xhr.readyState == 4) {
 				try {
@@ -1331,7 +1332,7 @@
 			WARNINGS:
 				-- No content-type header sent if not serialised generic object
 				-- Serialised object always appended to URL with '?' prefix if method is not POST
-		*/
+		*
 		if (dataToSend && !dataToSendIsFormData && typeof dataToSend == TYPEOF_OBJECT) {
 			dataToSend = zQ_fn_serialise_object(dataToSend);
 
@@ -1357,29 +1358,13 @@
 				// WARNING: Set flag first
 				aborted = true;
 				xhr.abort();
-			},
-			/* DEPRECATED 2.0
-			error: function(func) {
-				handler_error = func || gen_func;
-				return this;
-			},
-			success: function(func) {
-				handler_success = func || gen_func;
-				return this;
-			},
-			on: function(event, handler) {
-				xhr.addEventListener(event, handler);
-				return this;
 			}
-			*/
 		};
 	};
-
-	/* DEPRECATED 2.0
-	$.isArrayLike = is_probably_array_like;
 	*/
 
-	/*
+	/* DEPRECATED 2.0
+
 		Iterate through a provided string, array, array-like object or object using a provided function. The function will be passed the arguments for an object:
 
 			- The property's value
@@ -1404,7 +1389,7 @@
 
 		WARNING: Don't change {init_ret} to second arg if second arg is not function, as user may want {init_ret} to be a function.
 		WARNING: Won't iterate over values of undefined (whether not defined, deleted or set to <undefined>) in array(-like object)s.
-	*/
+
 	$.each = function(obj_or_arr, func, init_ret) {
 		if (typeof obj_or_arr == TYPEOF_STRING) {
 			obj_or_arr = obj_or_arr.split('');
@@ -1438,18 +1423,12 @@
 		return ret;
 	};
 	$.each.stop = {};
+	*/
+
 	/*
 		Deepness:
-			0 or false or undefined: Shallow copy
-			1: Deep copy (all array(-like object)s and generic objects at all depths will also be shallow-copied)
-
-			// DEPRECATED 2.0
-				2: Super copy:
-					- All generic objects and array-like* objects will be super-copied (* array-like objects will be converted into an array)
-					- Nodes will all be deep-copied at all levels, whether they are in an array(-like object) or children of a parent node
-					- Documents will be replaced with a deep-copied clone of its <html> element
-					- DocumentFragments will be replaced with a deep-copied generic array of their children
-					- Functions will be cloned
+			false or undefined: Shallow copy
+			true: Deep copy (all array(-like object)s and generic objects at all depths will also be shallow-copied)
 
 		WARNING: MANY WARNINGS
 		======================
@@ -1472,21 +1451,6 @@
 			length,
 			_,
 			replacement;
-
-		/* DEPRECATED 2.0
-		if (deepness == 2 && to_clone) {
-			if ((_ = to_clone.content || to_clone) instanceof DF) {
-				ret = zQ_fn_import_DF(_);
-			} else if ((_ = to_clone.documentElement || to_clone) instanceof EN) {
-				ret = _.cloneNode(true);
-			} else if (typeof to_clone == TYPEOF_FUNCTION) {
-				ret = to_clone.bind(undefined);
-				objKeys(ret).forEach(function(prop) {
-					ret[prop] = to_clone[prop];
-				});
-			}
-		}
-		*/
 
 		if (is_array) {
 			ret = zQ_fn_clone_array(to_clone);
@@ -1522,6 +1486,7 @@
 			return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 		}
 	};
+	/* DEPRECATED 2.0
 	$.shuffle = function(array) {
 		array = zQ_fn_clone_array(array);
 
@@ -1535,43 +1500,6 @@
 		}
 
 		return array;
-	};
-
-	/* DEPRECATED 2.0
-	$.factory = function(template, variables_str, replacements_raw, escape_HTML) {
-		var i = 0,
-			code_final = '',
-			code_run,
-			replacement,
-			replacements,
-			arr,
-			multirun,
-			runs = 1,
-			variables = variables_str.split(zQ_set_regexp_whitespace),
-			mirrorargs = isArr(replacements_raw) && variables.length == replacements_raw.length,
-			escape_HTML = escape_HTML === true;
-
-		if (multirun =
-			( arr = isArr(replacements_raw[0]) ) ||
-			( variables.length == 1 && isArr(replacements_raw) && replacements_raw.length > 1 )
-		) {
-			runs = replacements_raw.length;
-		}
-
-		for ( ; i < runs; ++i) {
-			code_run = template;
-			replacements = multirun ? replacements_raw[i] : replacements_raw;
-			variables.forEach(function(variable, j) {
-				variable = new RegExp('\\$\\{' + variable + '\\}', 'g');
-				replacement = (mirrorargs || arr) ? replacements[j] : replacements;
-				if (escape_HTML) {
-					replacement = zQ_fn_escape_HTML(replacement);
-				}
-				code_run = code_run.replace(variable, replacement);
-			});
-			code_final += code_run;
-		}
-		return code_final;
 	};
 	*/
 
