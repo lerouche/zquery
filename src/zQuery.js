@@ -209,67 +209,60 @@
 				WARNING: May return empty array, which is == false but TRUTHY
 			*/
 
-			if (html[0] == '<') {
-				var tag = zQ_set_regexp_tag.exec(html)[1].toLowerCase(),
-					parser,
-					wrap,
-					i;
-				/*
-					PROBLEM: Can't create <html>, <head> or <body> inside temporary <div>.
-					SOLUTION: Use DOMParser.
-				*/
-				if (/^(html|head|body)$/.test(tag)) {
-					(parser = (new DOMParser).parseFromString(html, 'text/html')).html = parser.documentElement;
+			// OVERRIDE: HTML may start with text
+			// if (html[0] == '<') {
 
-					// Only return <html> if empty single HTML tag, not <html><head></head><body></body></html>
-					// WARNING: Returned array-like objects cannot do special array methods of calculating emptiness such as !([] + []) or [] == false
-					// NOTE: Can't use getElementsBy... or qSA as they don't include text nodes
-					// WARNING: Will always return single <html> element if <head> and <body> empty, even if provided in string
-					return [
-						parser[tag].cloneNode(tag != 'html' || !!(parser.head.childNodes.length + parser.body.childNodes.length))
-					];
-				}
+			var tag = zQ_set_regexp_tag.exec(html)[1].toLowerCase(),
+				parser,
+				wrap,
+				i;
+			/*
+				PROBLEM: Can't create <html>, <head> or <body> inside temporary <div>.
+				SOLUTION: Use DOMParser.
+			*/
+			if (/^(html|head|body)$/.test(tag)) {
+				(parser = (new DOMParser).parseFromString(html, 'text/html')).html = parser.documentElement;
 
-				/*
-					PROBLEM: Creating script tag inside temporary <div> will cause it to load its script if 'src' property is set before attaching to real document, making it a dud when appended to real document.
-					SOLUTION: Don't clone node when <script> element found, create a new one instead.
-					WARNING: All data inside <script> and its attributes except "src" will be deleted.
-				*/
-				else {
-					wrap = zQ_set_wrapMap[tag] || [0, '', ''];
-					parser = d.createElement('div');
-					parser.innerHTML = wrap[1] + html + wrap[2];
-					i = wrap[0];
-					while (i--) {
-						parser = parser.lastChild;
-					}
-					// Must clone all children elements (not nodes) of parse container (<div>) to detach them from the parser
-					return ap.map.call(parser.childNodes, function(c) {
-						if (c.nodeName.toLowerCase() == 'script') {
-							var clone = d.createElement('script');
-							// defer and async are ignored because all dynamic JS are loaded asynchronously
-							[
-								'text', 'type', 'src',
-								'integrity', 'crossorigin', 'charset',
-								'id', 'className',
-								'onload', 'onerror'
-							].forEach(function(prop) {
-								clone[prop] = c[prop];
-							});
-							return clone;
-						}
-						return c.cloneNode(true);
-					});
-				}
+				// Only return <html> if empty single HTML tag, not <html><head></head><body></body></html>
+				// WARNING: Returned array-like objects cannot do special array methods of calculating emptiness such as !([] + []) or [] == false
+				// NOTE: Can't use getElementsBy... or qSA as they don't include text nodes
+				// WARNING: Will always return single <html> element if <head> and <body> empty, even if provided in string
+				return [
+					parser[tag].cloneNode(tag != 'html' || !!(parser.head.childNodes.length + parser.body.childNodes.length))
+				];
 			}
-		},
 
-		zQ_fn_getText = function(elem) {
-			var text = '';
-			zQ_fn_iterate(elem.childNodes, function(child) {
-				text += child.nodeType == 3 ? child.nodeValue : zQ_fn_getText(child);
-			}, false);
-			return text;
+			/*
+				PROBLEM: Creating script tag inside temporary <div> will cause it to load its script if 'src' property is set before attaching to real document, making it a dud when appended to real document.
+				SOLUTION: Don't clone node when <script> element found, create a new one instead.
+				WARNING: Some properties may not be cloned.
+			*/
+			else {
+				wrap = zQ_set_wrapMap[tag] || [0, '', ''];
+				parser = d.createElement('div');
+				parser.innerHTML = wrap[1] + html + wrap[2];
+				i = wrap[0];
+				while (i--) {
+					parser = parser.lastChild;
+				}
+				// Must clone all child nodes of parse container (<div>) to detach them from the parser
+				return ap.map.call(parser.childNodes, function(c) {
+					if (c.nodeName.toLowerCase() == 'script') {
+						var clone = d.createElement('script');
+						// defer and async are ignored because all dynamic JS are loaded asynchronously
+						[
+							'text', 'type', 'src',
+							'integrity', 'crossorigin', 'charset',
+							'id', 'className',
+							'onload', 'onerror'
+						].forEach(function(prop) {
+							clone[prop] = c[prop];
+						});
+						return clone;
+					}
+					return c.cloneNode(true);
+				});
+			}
 		},
 
 		zQ_set_wrapMap = {
@@ -358,7 +351,7 @@
 				// If match, set {result} to true and return false (break),
 				// else set {result} to false and return true (does nothing)
 				return !(result = elem === m);
-			}, result);
+			}, false);
 			return result;
 		},
 
@@ -373,14 +366,20 @@
 		// NOTE: (insert)Before/After don't work when there is no parent (e.g. a parsed HTML Element or root node)
 		zQ_fn_appendPrepend = function(mode, switch_roles, elems, nodes) {
 			/*
+				Modes:
+					0: prepend, prependTo
+					1: append, appendTo
+					2: before, insertBefore,
+					3: after, insertAfter
+
 				When using as appendTo or prependTo, it returns a new zQuery object containing all the HTMLElements that were appended (including clones), not just the original ones.
 
 				When using as append or prepend, it returns the original zQuery object as usual.
 			*/
 
 			if (typeof nodes == TYPEOF_STRING) {
-				nodes = nodes[0] == '<' ? zQ_fn_parseHTML(nodes) : switch_roles ? qsa(nodes) : [d.createTextNode(nodes)]; // Parse HTML and use elements if any valid; otherwise create a textNode or find the appropriate elements to modify
-			} else if (nodes instanceof EN) {
+				nodes = switch_roles ? qsa(nodes) : zQ_fn_parseHTML(nodes); // Parse HTML and use elements if any valid; otherwise create a textNode or find the appropriate elements to modify
+			} else if (nodes instanceof N) {
 				nodes = [nodes];
 			} else if (nodes instanceof HC || nodes instanceof NL) {
 				nodes = zQ_fn_clone_array(nodes); // Prevent possible infinite loop or duplication with live lists
@@ -418,7 +417,7 @@
 
 					Therefore reversal is needed to keep the original order of the nodes to be added.
 			*/
-			if ((mode + 1) % 2) {
+			if (!(mode % 2)) {
 				nodes.reverse();
 			}
 			zQ_fn_iterate(elems, function(elem, i, t) {
@@ -833,8 +832,8 @@
 		}
 
 		text = '';
-		zQ_fn_iterate(this, function(elem) {
-			text += zQ_fn_getText(elem);
+		zQ_fn_iterate(this, function(node) {
+			text += node.textContent;
 		}, false);
 		return text;
 	};
@@ -1120,7 +1119,7 @@
 	// WARNING: The names must be in this order, as otherwise it will break the methods setup (below)
 	['prepend', 'append', 'before', 'after', 'prependTo', 'appendTo', 'insertBefore', 'insertAfter'].forEach(function(methodName, i) {
 		p[methodName] = function(nodes) {
-			return zQ_fn_appendPrepend(i % 4, ~methodName.indexOf("To") || ~methodName.indexOf("insert"), this, nodes);
+			return zQ_fn_appendPrepend(i % 4, /To|insert/.test(methodName), this, nodes);
 		};
 	});
 
