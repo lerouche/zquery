@@ -452,14 +452,7 @@
 				} while (all && elem);
 				return ret;
 			});
-		},
-
-	/*
-		Compatibility
-	*/
-
-		ENp = EN.prototype;
-		ENp.matches = ENp.matches || ENp.webkitMatchesSelector || ENp.msMatchesSelector;
+		};
 
 
 	/*
@@ -1258,173 +1251,6 @@
 		PUBLIC methods
 	*/
 
-	/* DEPRECATED 2.0
-
-		Asynchronous JavaScript and XML
-
-	$.ajax = function(ajaxSettings) {
-		var xhr = new XMLHttpRequest(),
-			beforeSend = ajaxSettings.beforeSend || gen_func,
-
-			handler_error = ajaxSettings.error || gen_func,
-			handler_success = ajaxSettings.success || gen_func,
-			handler_complete = ajaxSettings.complete || gen_func,
-			aborted,
-
-			headers = ajaxSettings.headers || {},
-
-			uploadHandlers = ajaxSettings.upload || {},
-			downloadHandlers = ajaxSettings.download || {},
-
-			dataToSend = ajaxSettings.data || nil,
-			dataToSendIsFormData = dataToSend instanceof FormData,
-			method = ajaxSettings.method || 'GET',
-			URL = ajaxSettings.url,
-
-			statusOK,
-			xhrErrorObject;
-
-		xhr.onreadystatechange = function() {
-			/*
-				So it's the spec to set readyState to 4 and fire this event on abort, and THEN set readyState to 0 (firing this event once more)...
-			*
-			// 4 is Complete state
-			if (!aborted && xhr.readyState == 4) {
-				try {
-					// If no error will be thrown, set the error object to the status (which is the HTTP response code)
-					xhrErrorObject = xhr.status;
-					statusOK = xhrErrorObject >= 200 && xhrErrorObject < 300 || xhrErrorObject == 304;
-				} catch (e) {
-					// Communication/network error
-					xhrErrorObject = e;
-					statusOK = false;
-				}
-
-				if (statusOK) {
-					// 2XX or 304 code means OK
-					handler_success(xhr.responseText);
-				} else {
-					// Send back the error object and HTTP code, assuming code !== 2XX or 304 means error
-					// If error was not caught and instead is the status code, construct an error
-					if (!(xhrErrorObject instanceof Error)) {
-						xhrErrorObject = Error('Request failed with status: ' + xhrErrorObject);
-					}
-					handler_error(xhrErrorObject, xhr.status, xhr.statusText);
-				}
-
-				// Run complete handler on Complete state
-				handler_complete();
-			}
-		};
-
-		// Add download event handlers
-		zQ_fn_iterate_object(downloadHandlers, function(eventType, eventHandler) {
-			xhr.addEventListener(eventType, eventHandler);
-		});
-
-		// Add upload event handlers
-		zQ_fn_iterate_object(uploadHandlers, function(eventType, eventHandler) {
-			xhr.upload.addEventListener(eventType, eventHandler);
-		});
-
-		// NOTE: Null and FormData are objects, so check for those before verifying data is generic object
-		/*
-			WARNINGS:
-				-- No content-type header sent if not serialised generic object
-				-- Serialised object always appended to URL with '?' prefix if method is not POST
-		*
-		if (dataToSend && !dataToSendIsFormData && typeof dataToSend == TYPEOF_OBJECT) {
-			dataToSend = zQ_fn_serialise_object(dataToSend);
-
-			// Do not set Content-Type header if FormData or plain text string
-			if (method == 'POST') {
-				headers['Content-Type'] = 'application/x-www-form-urlencoded';
-			} else {
-				URL += '?' + dataToSend;
-				dataToSend = nil;
-			}
-		}
-
-		xhr.open(method, URL, true);
-		zQ_fn_iterate_object(headers, function(header, header_value) {
-			xhr.setRequestHeader(header, header_value);
-		});
-
-		beforeSend(xhr);
-		xhr.send(dataToSend);
-
-		return {
-			abort: function() {
-				// WARNING: Set flag first
-				aborted = true;
-				xhr.abort();
-			}
-		};
-	};
-	*/
-
-	/* DEPRECATED 2.0
-
-		Iterate through a provided string, array, array-like object or object using a provided function. The function will be passed the arguments for an object:
-
-			- The property's value
-			- The property's name
-			- The last non-<undefined> returned value from previous function calls (provided by third argument at beginning or <undefined> if not provided)
-			- The total amount of properties
-
-		For an array(-like object, which includes strings):
-			- The element
-			- The element's index
-			- The last non-<undefined> returned value from previous function calls (provided by third argument at beginning or <undefined> if not provided)
-			- The total amount of elements
-
-		This function combines:
-			- .forEach
-			- .map
-			- .reduce
-			- .some
-			- .every
-		methods for arrays and introduces them to objects.
-		Return $.each.stop, true or false to break during iteration. Function returns whatever was last returned at the end unless it was $.each.stop (so returning a boolean will return that boolean at the end, regardless of what the returned value was before).
-
-		WARNING: Don't change {init_ret} to second arg if second arg is not function, as user may want {init_ret} to be a function.
-		WARNING: Won't iterate over values of undefined (whether not defined, deleted or set to <undefined>) in array(-like object)s.
-
-	$.each = function(obj_or_arr, func, init_ret) {
-		if (typeof obj_or_arr == TYPEOF_STRING) {
-			obj_or_arr = obj_or_arr.split('');
-		}
-		var is_arr = is_probably_array_like(obj_or_arr),
-			keys = is_arr ? obj_or_arr : objKeys(obj_or_arr),
-			keys_count = keys.length,
-			index = 0,
-			key_or_value,
-			ret = init_ret,
-			response;
-
-		for ( ; index < keys_count; ++index) {
-			key_or_value = keys[index];
-			if (key_or_value !== undefined) {
-				if (is_arr) {
-					response = func(key_or_value, index, ret, keys_count);
-				} else {
-					response = func(obj_or_arr[key_or_value], key_or_value, ret, keys_count);
-				}
-				if (response == $.each.stop) {
-					break;
-				} else if (response === true || response === false) {
-					ret = response;
-					break;
-				} else if (response !== undefined) {
-					ret = response;
-				}
-			}
-		};
-		return ret;
-	};
-	$.each.stop = {};
-	*/
-
 	/*
 		Deepness:
 			false or undefined: Shallow copy
@@ -1486,22 +1312,6 @@
 			return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 		}
 	};
-	/* DEPRECATED 2.0
-	$.shuffle = function(array) {
-		array = zQ_fn_clone_array(array);
-
-		var m = array.length, t, i;
-
-		while (m) {
-			i = (Math.random() * m--) | 0;
-			t = array[m];
-			array[m] = array[i];
-			array[i] = t;
-		}
-
-		return array;
-	};
-	*/
 
 	// Setup complete, return pseudo-constructor alias
 	if (typeof exports == TYPEOF_OBJECT) {
