@@ -3,7 +3,7 @@
 zQuery aims to be an extremely small library that replaces and extends jQuery.
 
 zQuery encourages the use of new browsers and features without diverting too much from the jQuery flow.
-It comes in at ~11KB minified and ~4KB GZipped, and is compatible with the latest browsers.
+It comes in at ~10KB minified and ~4KB GZipped, and is compatible with the latest browsers.
 
 Set up
 -----
