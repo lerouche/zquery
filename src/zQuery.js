@@ -945,7 +945,7 @@
 					}
 			}
 
-			TIP: Setting a specific style's value to null or "" (but NOT undefined) will remove it
+			TIP: Setting a specific style's value to "" will remove it
 		*/
 
 		// If {styles} is null, reset inline styling
