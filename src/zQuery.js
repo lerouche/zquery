@@ -212,7 +212,7 @@
 			// OVERRIDE: HTML may start with text
 			// if (html[0] == '<') {
 
-			var tag = zQ_set_regexp_tag.exec(html)[1].toLowerCase(),
+			var tag = (zQ_set_regexp_tag.exec(html) || ['', ''])[1].toLowerCase(),
 				parser,
 				wrap,
 				i;
