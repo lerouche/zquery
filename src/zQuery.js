@@ -151,7 +151,7 @@
 		zQ_set_prop_eventListeners = '_zqel',
 		zQ_set_regexp_whitespace = /\s+/,
 		zQ_set_regexp_captureEvents = /^(load|focus|blur|scroll|mouse(enter|leave))$/i,
-		zQ_set_regexp_handlebars = /{{\s*([$_a-zA-Z][$_a-zA-Z0-9]*)\s*}}/g,
+		zQ_set_regexp_handlebars = /({{|\[\[)\s*([$_a-zA-Z][$_a-zA-Z0-9]*)\s*(]]|}})/g,
 
 		/*
 			Merge all other provided arrays to the first provided array
@@ -465,6 +465,22 @@
 		return this;
 	};
 
+	p[Symbol.iterator] = function() {
+		var currentIndex = -1,
+			$inst = this;
+
+		return {
+			next: function() {
+				var $elem = $inst.eq(++currentIndex);
+				if ($elem == null) {
+					return { done: true };
+				} else {
+					return { value: $elem, done: false };
+				}
+			}
+		};
+	};
+
 	p.each = function(fn) {
 		zQ_fn_iterate(this, fn, false);
 		return this;
@@ -704,8 +720,10 @@
 			return zQ_fn_iterate(this, function(elem) {
 				if (elem instanceof EN) {
 					var html = elem.outerHTML;
-					html = html.replace(zQ_set_regexp_handlebars, function(_, propName) {
-						return zQ_fn_escape_HTML(data[propName]);
+					html = html.replace(zQ_set_regexp_handlebars, function(_, bar, propName) {
+						var propValue = data[propName];
+						if (bar == '{') propValue = zQ_fn_escape_HTML(propValue);
+						return propValue;
 					});
 					return zQ_fn_parseHTML(html);
 				}
