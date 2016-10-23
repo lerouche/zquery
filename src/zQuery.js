@@ -722,7 +722,7 @@
 					var html = elem.outerHTML;
 					html = html.replace(zQ_set_regexp_handlebars, function(_, bar, propName) {
 						var propValue = data[propName];
-						if (bar == '{') propValue = zQ_fn_escape_HTML(propValue);
+						if (bar == '{{') propValue = zQ_fn_escape_HTML(propValue);
 						return propValue;
 					});
 					return zQ_fn_parseHTML(html);
@@ -736,7 +736,7 @@
 				elemToCheck,
 				assoc = {},
 				initAssoc = function(code, node) {
-					return code.replace(zQ_set_regexp_handlebars, function(_, propName) {
+					return code.replace(zQ_set_regexp_handlebars, function(_, bar, propName) {
 						if (!assoc[propName]) {
 							assoc[propName] = [];
 						}
@@ -772,7 +772,7 @@
 					if (associations) {
 						zQ_fn_iterate(associations, function(attrOrTextnode) {
 							attrOrTextnode[attrOrTextnode instanceof Attr ? 'value' : 'textContent'] = attrOrTextnode[TEMPLATE_TEXT_PROP_NAME]
-								.replace(zQ_set_regexp_handlebars, function(_, propName) {
+								.replace(zQ_set_regexp_handlebars, function(_, bar, propName) {
 									return target[propName];
 								});
 						}, false);
@@ -835,18 +835,24 @@
 	};
 
 	p.text = function(text) {
-		if (text !== undefined) {
+		if (text !== undefined && typeof text != TYPEOF_BOOLEAN) {
 			zQ_fn_iterate(this, function(elem) {
 				elem.textContent = text;
 			}, false);
 			return this;
 		}
 
-		text = '';
+		var retArr = text === true,
+			ret = retArr ? [] : '';
 		zQ_fn_iterate(this, function(node) {
-			text += node.textContent;
+			var nodeText = node.textContent;
+			if (retArr) {
+				ret.push(nodeText);
+			} else {
+				ret += nodeText;
+			}
 		}, false);
-		return text;
+		return ret;
 	};
 
 	// NOTE: Will not get the value of a <select> option if it is disabled
