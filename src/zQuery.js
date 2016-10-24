@@ -597,7 +597,7 @@
 			Provide a selector or any valid HTMLElement-related object (zQuery, HTMLCollection, NodeList, HTMLElement) to filter based on them
 		*/
 		if (typeof selOrFn == TYPEOF_FUNCTION) {
-			return zQ_fn_iterate(this, selOrFn);
+			return $(this.get().filter(selOrFn));
 		}
 		return $(zQ_fn_filter(this.get(), selOrFn));
 	};
