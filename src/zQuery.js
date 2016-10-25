@@ -871,7 +871,10 @@
 			tagName = newVal.tagName;
 			if (/^(INPUT|TEXTAREA|OPTION|BUTTON)$/.test(tagName)) {
 				if (newVal.type == 'file') {
-					return zQ_fn_clone_array(newVal.files);
+					if (newVal.multiple) {
+						return zQ_fn_clone_array(newVal.files);
+					}
+					return newVal.files[0];
 				}
 				return newVal.value;
 			} else if (tagName == 'SELECT') {
