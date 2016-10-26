@@ -452,8 +452,12 @@
 				} while (all && elem);
 				return ret;
 			});
-		};
+		},
 
+		Ep = EN.prototype;
+
+	// Compatibility for Microsoft Edge
+	Ep.matches = Ep.matches || Ep.msMatchesSelector;
 
 	/*
 		Set up methods
