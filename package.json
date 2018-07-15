@@ -1,21 +1,25 @@
 {
-  "name": "zquery-wl",
+  "name": "@wzlin/zquery",
   "version": "2.0.0",
   "description": "A modern, super-lightweight DOM library for Evergreener pastures",
   "main": "dist/zQuery.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lerouche/zQuery.git"
+    "url": "git+https://github.com/wilsonzlin/zQuery.git"
   },
   "keywords": [
     "zquery",
     "jquery",
     "dom"
   ],
-  "author": "Wilson Lin",
+  "author": {
+    "email": "contact@wilsonl.in",
+    "name": "Wilson Lin",
+    "url": "https://wilsonl.in/"
+  },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/lerouche/zQuery/issues"
+    "url": "https://github.com/wilsonzlin/zQuery/issues"
   },
-  "homepage": "https://github.com/lerouche/zQuery#readme"
+  "homepage": "https://github.com/wilsonzlin/zQuery#readme"
 }
