@@ -1,17 +1,18 @@
-const fs = require('fs'),
+const fs = require("fs");
+const Path = require("path");
+const minimist = require("minimist");
 
-	  SRC_DIR = __dirname + '/src';
+const SRC_DIR = Path.join(__dirname, "src");
 
-var args = process.argv.slice(2),
-	dest = args.find(arg => /^\-o=.+$/.test(arg)),
-	debug = args.some(arg => /^debug$/.test(arg));
+const ARGS = minimist(process.argv.slice(2));
 
-dest = dest ? dest.slice(3) : __dirname + '/dist';
+const OUTPUT_DIR = ARGS.out || Path.join(__dirname, "dist");
+const DEBUG = ARGS.debug;
 
-require('zcompile')({
-	src: SRC_DIR,
-	dst: dest,
+require("zcompile")({
+  src: SRC_DIR,
+  dst: OUTPUT_DIR,
 
-	files: fs.readdirSync(SRC_DIR),
-	debug: debug,
+  files: fs.readdirSync(SRC_DIR),
+  debug: DEBUG,
 });
