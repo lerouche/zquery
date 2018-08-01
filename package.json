@@ -31,6 +31,8 @@
   },
   "homepage": "https://github.com/wilsonzlin/pagequery#readme",
   "devDependencies": {
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
+    "uglify-es": "^3.3.9"
   }
 }
