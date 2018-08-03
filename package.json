@@ -1,6 +1,6 @@
 {
   "name": "pagequery",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A modern, super-lightweight DOM library for Evergreener pastures",
   "main": "dist/pagequery.js",
   "files": [
