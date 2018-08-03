@@ -11,7 +11,7 @@ const ARGS = minimist(process.argv.slice(2));
 const OUTPUT_DIR = ARGS.out || Path.join(__dirname, "dist");
 const DEBUG = ARGS.debug;
 
-let code = fs.readFileSync(Path.join(SRC_DIR, "pathquery.js"), "utf8");
+let code = fs.readFileSync(Path.join(SRC_DIR, "pagequery.js"), "utf8");
 
 mkdirp.sync(OUTPUT_DIR);
 
@@ -51,4 +51,4 @@ let result = uglifyes.minify(code, {
   compress: compressSettings,
 });
 
-fs.writeFileSync(Path.join(OUTPUT_DIR, "pathquery.js"), result.code);
+fs.writeFileSync(Path.join(OUTPUT_DIR, "pagequery.js"), result.code);
