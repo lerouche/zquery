@@ -1,19 +1,19 @@
 {
-  "name": "pagequery",
+  "name": "extdom",
   "version": "2.0.1",
-  "description": "A modern, super-lightweight DOM library for Evergreener pastures",
-  "main": "dist/pagequery.js",
+  "description": "A lightweight jQuery-like DOM library for modern browsers",
+  "main": "dist/extdom.js",
   "files": [
     "dist/**"
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "npm run clean && node compile.js",
+    "build": "npm run clean && tsc",
     "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wilsonzlin/pagequery.git"
+    "url": "git+https://github.com/wilsonzlin/extdom.git"
   },
   "keywords": [
     "zquery",
@@ -27,12 +27,13 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/wilsonzlin/pagequery/issues"
+    "url": "https://github.com/wilsonzlin/extdom/issues"
   },
-  "homepage": "https://github.com/wilsonzlin/pagequery#readme",
+  "homepage": "https://github.com/wilsonzlin/extdom#readme",
   "devDependencies": {
     "minimist": "^1.2.0",
     "mkdirp": "^0.5.1",
-    "uglify-es": "^3.3.9"
+    "uglify-es": "^3.3.9",
+    "typescript": "^3.8.3"
   }
 }
